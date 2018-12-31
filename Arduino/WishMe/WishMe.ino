@@ -12,7 +12,7 @@ const int led = 13;
 
 void handleRoot() {
   digitalWrite(led, 1);
-  server.send(200, "text/plain", "hello from esp8266!");
+  server.send(200, "text/plain", "Hi there... There is a surprice for you at "+WiFi.localIP().toString()+"/wishme");
   digitalWrite(led, 0);
 }
 
@@ -43,7 +43,7 @@ void handleNotFound() {
 void setup(void) {
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
-  SPIFFS.begin(); 
+  SPIFFS.begin();   
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -66,11 +66,12 @@ void setup(void) {
 
   server.on("/", handleRoot);
 
-  server.on("/inline", []() {
+  server.on("/wishme", []() {
     
    if (SPIFFS.exists("/index.html")) {                            // If the file exists
     File file = SPIFFS.open("/index.html", "r");                 // Open it
-   server.send(200, "text/plain",""); // And send it to the client
+  // server.send(200, "text/plain",""); // And send it to the client
+  server.streamFile(file, "text/html");
     file.close();                                       // Then close the file again
     return true;
   }
